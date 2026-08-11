@@ -16,6 +16,12 @@ export default function RootLayout() {
           }}
         />
         <Drawer.Screen
+          name="(tabs)/account"
+          options={{
+            title: 'マイページ',
+          }}
+        />
+        <Drawer.Screen
           name="settings"
           options={{
             title: '設定',
