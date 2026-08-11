@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import Database from 'better-sqlite3';
 
 // ------------------------------------------------------------------
 // 簡易 CSV パーサー（外部ライブラリを使わずにカンマ区切り・引用符を処理）
@@ -114,37 +115,53 @@ function parseCsv(raw: string): Record<string, string>[] {
 const csvFilePath = path.resolve(__dirname, '../docs/新宿区公園一覧.csv');
 
 function main(): void {
+  const dbPath = path.resolve(__dirname, '../assets/places.db');
+  const db = new Database(dbPath);
+
+  // テーブル作成
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS places (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      address TEXT,
+      latitude REAL NOT NULL,
+      longitude REAL NOT NULL
+    );
+  `);
+
   const raw = fs.readFileSync(csvFilePath, 'utf-8');
   const rows = parseCsv(raw);
 
-  for (const row of rows) {
-    const name = String(row.name ?? '').trim();
-    const address = String(row.address ?? '').trim();
-    const lat = String(row.latitude ?? '').trim();
-    const lng = String(row.longitude ?? '').trim();
+  const insertStmt = db.prepare(
+    `INSERT OR IGNORE INTO places (name, address, latitude, longitude) VALUES (?, ?, ?, ?)`
+  );
 
-    if (!name || !lat || !lng) {
-      console.warn(
-        `スキップ: name/lat/lng が空の行があります → ${JSON.stringify(row)}`,
-      );
-      continue;
+  const insertMany = db.transaction((records: Record<string, string>[]) => {
+    for (const row of records) {
+      const name = String(row['公園名'] ?? row.name ?? '').trim();
+      const address = String(row['住所'] ?? row.address ?? '').trim();
+      const lat = String(row['緯度'] ?? row.latitude ?? '').trim();
+      const lng = String(row['経度'] ?? row.longitude ?? '').trim();
+
+      if (!name || !lat || !lng) {
+        console.warn(`スキップ: 必須項目不足 → ${JSON.stringify(row)}`);
+        continue;
+      }
+
+      const latNum = Number(lat);
+      const lngNum = Number(lng);
+      if (Number.isNaN(latNum) || Number.isNaN(lngNum)) {
+        console.warn(`スキップ: 緯度/経度が数値でない → ${JSON.stringify(row)}`);
+        continue;
+      }
+
+      insertStmt.run(name, address, latNum, lngNum);
     }
+  });
 
-    const latNum = Number(lat);
-    const lngNum = Number(lng);
-    if (Number.isNaN(latNum) || Number.isNaN(lngNum)) {
-      console.warn(
-        `スキップ: 経緯度が数値でない行 → ${JSON.stringify(row)}`,
-      );
-      continue;
-    }
-
-    const escapedName = name.replace(/'/g, "''");
-    const escapedAddress = address.replace(/'/g, "''");
-
-    const sql = `INSERT OR IGNORE INTO places (name, address, latitude, longitude) VALUES ('${escapedName}', '${escapedAddress}', ${latNum}, ${lngNum});`;
-    console.log(sql);
-  }
+  insertMany(rows);
+  console.log(`データベースに ${rows.length} 件の処理を完了しました。`);
+  db.close();
 }
 
 main();
