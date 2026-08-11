@@ -28,7 +28,7 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
           icon="map"
           theme={theme}
           onPress={() => {
-            router.push('/(tabs)');
+            router.push('/(tabs)/map');
           }}
         />
         <PaperDrawer.Item
