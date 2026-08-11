@@ -2,11 +2,12 @@ import 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/constants/theme';
+import { CustomDrawerContent } from '@/components/custom-drawer-content';
 
 export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
-      <Drawer>
+      <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
         <Drawer.Screen
           name="(tabs)"
           options={{
@@ -16,9 +17,9 @@ export default function RootLayout() {
           }}
         />
         <Drawer.Screen
-          name="(tabs)/account"
+          name="explore"
           options={{
-            title: 'マイページ',
+            title: 'Explore',
           }}
         />
         <Drawer.Screen
