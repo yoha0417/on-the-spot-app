@@ -11,6 +11,14 @@ export function CustomDrawerContent(props: React.ComponentProps<typeof ScrollVie
     <ScrollView {...props}>
       <View style={{ paddingTop: top }}>
         <PaperDrawer.Item
+          label="マップ"
+          icon="map"
+          theme={theme}
+          onPress={() => {
+            router.push('/(tabs)');
+          }}
+        />
+        <PaperDrawer.Item
           label="マイページ"
           icon="account"
           theme={theme}
