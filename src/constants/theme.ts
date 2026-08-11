@@ -9,6 +9,12 @@ export const Fonts = {
   }),
 };
 
+export const Spacing = {
+  half: 4,
+  two: 8,
+  five: 20,
+};
+
 export const theme = {
   ...PaperDefaultTheme,
   colors: {
