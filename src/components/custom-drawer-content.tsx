@@ -1,5 +1,5 @@
-import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
+import { ScrollView } from 'react-native';
 import { Drawer as PaperDrawer, useTheme } from 'react-native-paper';
 
 export function CustomDrawerContent(props: React.ComponentProps<typeof ScrollView>) {
@@ -8,11 +8,11 @@ export function CustomDrawerContent(props: React.ComponentProps<typeof ScrollVie
   return (
     <ScrollView {...props}>
       <PaperDrawer.Item
-        label="Explore"
-        icon="compass"
+        label="マイページ"
+        icon="account"
         theme={theme}
         onPress={() => {
-          router.push('/explore');
+          router.push('/(tabs)/account');
         }}
       />
       <PaperDrawer.Item
@@ -31,12 +31,12 @@ export function CustomDrawerContent(props: React.ComponentProps<typeof ScrollVie
           router.push('/attribution');
         }}
       />
-      <PaperDrawer.Item
-        label="マイページ"
-        icon="account"
+            <PaperDrawer.Item
+        label="Explore"
+        icon="compass"
         theme={theme}
         onPress={() => {
-          router.push('/(tabs)/account');
+          router.push('/explore');
         }}
       />
     </ScrollView>
