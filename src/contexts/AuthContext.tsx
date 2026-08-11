@@ -1,20 +1,20 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  ReactNode,
-} from 'react';
 import {
-  storeToken,
   getToken,
-  simulateLogin,
-  removeToken,
-  saveUserName,
   getUserName,
+  removeToken,
   removeUserName,
+  saveUserName,
+  simulateLogin,
+  storeToken,
 } from '@/utils/auth';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -42,14 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 起動時に保存されたユーザー名を読み込む
   useEffect(() => {
     (async () => {
-      try {
+      
         const savedName = await getUserName();
         if (savedName) {
           setUserName(savedName);
         }
-      } catch (_e) {
-        // ignore
-      }
     })();
   }, []);
 
