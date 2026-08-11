@@ -28,7 +28,7 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
           icon="map"
           theme={theme}
           onPress={() => {
-            router.push('/(tabs)/map');
+            router.push('/map');
           }}
         />
         <PaperDrawer.Item
@@ -36,7 +36,7 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
           icon="account"
           theme={theme}
           onPress={() => {
-            router.push('/(tabs)/account');
+            router.push('/account');
           }}
         />
         <PaperDrawer.Item
