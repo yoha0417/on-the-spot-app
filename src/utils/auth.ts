@@ -18,7 +18,7 @@ export function getToken(): AuthToken {
   // We use a sync wrapper for convenience; the actual retrieval on app start will use asynchronous version.
   try {
     return SecureStore.getItem(AUTH_TOKEN_KEY);
-  } catch (_e) {
+  } catch {
     return null;
   }
 }
@@ -26,7 +26,7 @@ export function getToken(): AuthToken {
 export async function getTokenAsync(): Promise<AuthToken> {
   try {
     return await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
-  } catch (_e) {
+  } catch {
     return null;
   }
 }
@@ -60,7 +60,7 @@ export async function saveUserName(name: string): Promise<void> {
 export async function getUserName(): Promise<string | null> {
   try {
     return await SecureStore.getItemAsync(USER_NAME_KEY);
-  } catch (_e) {
+  } catch {
     return null;
   }
 }

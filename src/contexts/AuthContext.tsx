@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(newToken);
       await saveUserName(receivedName);
       setUserName(receivedName);
-    } catch (_e) {
+    } catch {
       setError('ログインに失敗しました。入力内容をご確認ください。');
     }
   }, []);
