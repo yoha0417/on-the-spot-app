@@ -3,12 +3,11 @@ import { Drawer } from 'expo-router/drawer';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/constants/theme';
 import { CustomDrawerContent } from '@/components/custom-drawer-content';
-import type { DrawerContentComponentProps } from '@react-navigation/drawer'; // 追加
 
 export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
-      <Drawer drawerContent={(props) => <CustomDrawerContent {...(props as unknown as DrawerContentComponentProps)} />}>
+      <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
         <Drawer.Screen
           name="(tabs)"
           options={{

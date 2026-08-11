@@ -1,13 +1,36 @@
-import { DrawerContentScrollView, DrawerItemList, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Drawer as PaperDrawer, useTheme } from 'react-native-paper';
 
-export function CustomDrawerContent(props: DrawerContentComponentProps) {
+export function CustomDrawerContent(props: React.ComponentProps<typeof ScrollView>) {
   const theme = useTheme();
 
   return (
-    <DrawerContentScrollView {...props}>
-      <DrawerItemList {...props} />
+    <ScrollView {...props}>
+      <PaperDrawer.Item
+        label="Explore"
+        icon="compass"
+        theme={theme}
+        onPress={() => {
+          router.push('/explore');
+        }}
+      />
+      <PaperDrawer.Item
+        label="設定"
+        icon="cog"
+        theme={theme}
+        onPress={() => {
+          router.push('/settings');
+        }}
+      />
+      <PaperDrawer.Item
+        label="オープンデータ出典明記"
+        icon="information"
+        theme={theme}
+        onPress={() => {
+          router.push('/attribution');
+        }}
+      />
       <PaperDrawer.Item
         label="マイページ"
         icon="account"
@@ -16,6 +39,6 @@ export function CustomDrawerContent(props: DrawerContentComponentProps) {
           router.push('/(tabs)/account');
         }}
       />
-    </DrawerContentScrollView>
+    </ScrollView>
   );
 }
