@@ -1,17 +1,28 @@
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Drawer as PaperDrawer, useTheme } from 'react-native-paper';
+import {
+  Drawer as PaperDrawer,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function CustomDrawerContent(props: Record<string, unknown>) {
   const theme = useTheme();
   const { top } = useSafeAreaInsets();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, userName } = useAuth();
 
   return (
     <ScrollView {...props}>
-      <View style={{ paddingTop: top }}>
+      <View style={[styles.container, { paddingTop: top }]}>
+        {isAuthenticated && userName !== null && (
+          <View style={styles.header}>
+            <Text variant="titleMedium" style={styles.userNameText}>
+              {userName}
+            </Text>
+          </View>
+        )}
         <PaperDrawer.Item
           label="マップ"
           icon="map"
@@ -76,3 +87,19 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    marginBottom: 4,
+  },
+  userNameText: {
+    fontWeight: '600',
+  },
+});

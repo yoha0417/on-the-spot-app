@@ -17,14 +17,14 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function LoginScreen() {
   const theme = useTheme();
   const { login, error } = useAuth();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      await login(username, password);
+      await login(email, password);
       router.replace('/(tabs)');
     } finally {
       setLoading(false);
@@ -50,11 +50,12 @@ export default function LoginScreen() {
           ログイン
         </Text>
         <TextInput
-          label="ユーザー名"
-          value={username}
-          onChangeText={setUsername}
+          label="メールアドレス"
+          value={email}
+          onChangeText={setEmail}
           autoCapitalize="none"
           autoCorrect={false}
+          keyboardType="email-address"
           style={{ marginBottom: 12 }}
         />
         <TextInput
@@ -75,7 +76,7 @@ export default function LoginScreen() {
           mode="contained"
           onPress={handleLogin}
           loading={loading}
-          disabled={loading || username.length === 0 || password.length === 0}
+          disabled={loading || email.length === 0 || password.length === 0}
           style={{ marginTop: 12 }}
         >
           ログイン
