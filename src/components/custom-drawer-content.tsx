@@ -13,8 +13,8 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
   const { top } = useSafeAreaInsets();
   const { isAuthenticated, logout, userName } = useAuth();
 
-  const mapHref = '/map' as Href;
-  const accountHref = '/account' as Href;
+  const mapHref = '/(tabs)/map' as Href;
+  const accountHref = '/(tabs)/account' as Href;
   const settingsHref = '/settings' as Href;
 
   return (
