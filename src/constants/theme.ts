@@ -1,4 +1,13 @@
+import { Platform } from 'react-native';
 import { MD3LightTheme as PaperDefaultTheme } from 'react-native-paper';
+
+export const Fonts = {
+  mono: Platform.select({
+    ios: 'Courier',
+    android: 'monospace',
+    default: 'monospace',
+  }),
+};
 
 export const theme = {
   ...PaperDefaultTheme,
@@ -9,3 +18,5 @@ export const theme = {
     onPrimaryContainer: '#ffffff',
   },
 };
+
+export type ThemeColor = keyof typeof theme.colors;
