@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Drawer as PaperDrawer, useTheme } from 'react-native-paper';
 
-export function CustomDrawerContent(props: React.ComponentProps<typeof ScrollView>) {
+export function CustomDrawerContent(props: Record<string, unknown>) {
   const theme = useTheme();
   const { top } = useSafeAreaInsets();
 
