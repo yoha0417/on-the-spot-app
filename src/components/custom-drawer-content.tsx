@@ -1,12 +1,12 @@
-import { ScrollView, View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   Drawer as PaperDrawer,
   Text,
   useTheme,
 } from 'react-native-paper';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export function CustomDrawerContent(props: Record<string, unknown>) {
   const theme = useTheme();
