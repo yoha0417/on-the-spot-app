@@ -9,3 +9,5 @@ npx tsc --noEmit
 
 echo "🩺 Expoの環境診断を実行中..."
 npx expo-doctor
+echo "🩺 expo lint --fixを実行中..."
+npx expo lint --fix

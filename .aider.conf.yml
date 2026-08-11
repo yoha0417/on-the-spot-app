@@ -27,7 +27,7 @@ cache-prompts: true
 auto-lint: true
 
 # 実行するLintコマンド（導入済みのBiomeを指定）
-lint-cmd: "npx biome check --write"
+lint-cmd: "npx expo lint --fix"
 
 # ---------------------------------------------------------
 # Git連携の調整（おすすめ追加）

@@ -1,21 +1,19 @@
+import { useAuth } from '@/contexts/AuthContext';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
   KeyboardAvoidingView,
   Platform,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
 import {
-  TextInput,
   Button,
-  Text,
   HelperText,
-  useTheme,
+  Text,
+  TextInput
 } from 'react-native-paper';
-import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginScreen() {
-  const theme = useTheme();
   const { login, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

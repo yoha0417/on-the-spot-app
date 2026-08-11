@@ -42,11 +42,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 起動時に保存されたユーザー名を読み込む
   useEffect(() => {
     (async () => {
-      
-        const savedName = await getUserName();
-        if (savedName) {
-          setUserName(savedName);
-        }
+       try {
+          const savedName = await getUserName();
+          if (savedName) {
+            setUserName(savedName);
+          }
+        } catch {
+          setError('ログインに失敗しました。入力内容をご確認ください。');
+    }
     })();
   }, []);
 
