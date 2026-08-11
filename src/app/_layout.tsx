@@ -11,6 +11,8 @@ export default function RootLayout() {
           name="(tabs)"
           options={{
             title: 'ホーム',
+            headerShown: false,
+            drawerItemStyle: { display: 'none' },
           }}
         />
         <Drawer.Screen
