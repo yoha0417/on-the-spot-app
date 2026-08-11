@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { router } from 'expo-router';
+import { router, Href } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   Drawer as PaperDrawer,
@@ -12,6 +12,10 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
   const theme = useTheme();
   const { top } = useSafeAreaInsets();
   const { isAuthenticated, logout, userName } = useAuth();
+
+  const mapHref = '/map' as Href;
+  const accountHref = '/account' as Href;
+  const settingsHref = '/settings' as Href;
 
   return (
     <ScrollView {...props}>
@@ -28,7 +32,7 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
           icon="map"
           theme={theme}
           onPress={() => {
-            router.push('/map');
+            router.push(mapHref);
           }}
         />
         <PaperDrawer.Item
@@ -36,7 +40,7 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
           icon="account"
           theme={theme}
           onPress={() => {
-            router.push('/account');
+            router.push(accountHref);
           }}
         />
         <PaperDrawer.Item
@@ -44,7 +48,7 @@ export function CustomDrawerContent(props: Record<string, unknown>) {
           icon="cog"
           theme={theme}
           onPress={() => {
-            router.push('/settings');
+            router.push(settingsHref);
           }}
         />
         <PaperDrawer.Item
