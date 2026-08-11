@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { MD3LightTheme as PaperDefaultTheme } from 'react-native-paper';
+import { MD3LightTheme as PaperDefaultTheme, MD3DarkTheme as PaperDarkTheme } from 'react-native-paper';
 
 export const Fonts = {
   mono: Platform.select({
@@ -15,13 +15,25 @@ export const Spacing = {
   five: 20,
 };
 
+const customColors = {
+  primary: '#10B981',
+  primaryContainer: '#10B981',
+  onPrimaryContainer: '#ffffff',
+};
+
 export const theme = {
   ...PaperDefaultTheme,
   colors: {
     ...PaperDefaultTheme.colors,
-    primary: '#10B981',
-    primaryContainer: '#10B981',
-    onPrimaryContainer: '#ffffff',
+    ...customColors,
+  },
+};
+
+export const Colors = {
+  light: theme.colors,
+  dark: {
+    ...PaperDarkTheme.colors,
+    ...customColors,
   },
 };
 
