@@ -1,7 +1,7 @@
-import { Tabs , useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable } from 'react-native';
+import { Tabs, useNavigation } from 'expo-router';
 import { DrawerActions } from 'expo-router/react-navigation';
+import { Pressable } from 'react-native';
 
 export default function TabLayout() {
   const navigation = useNavigation();
