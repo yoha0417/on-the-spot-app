@@ -1,0 +1,9 @@
+# .aider.conf.yml
+model: openrouter/deepseek/deepseek-v4-pro
+weak-model: openrouter/deepseek/deepseek-chat
+auto-commits: false
+
+# 常に編集対象として読み込むファイル
+file:
+  - AGENTS.md
+  - README.md
