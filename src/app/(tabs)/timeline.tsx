@@ -1,14 +1,11 @@
 import { router } from 'expo-router';
 import { useCheckIn } from '@/contexts/CheckInContext';
 import { ProtectedScreen } from '@/components/protected-screen';
-import { fetchTimelinePosts } from '@/services/timelineApi';
+import { fetchTimelinePosts , createPost } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Text, useTheme } from 'react-native-paper';
-import { Modal, TextInput } from 'react-native';
-import { FAB, Switch } from 'react-native-paper';
-import { createPost } from '@/services/timelineApi';
+import { Alert, FlatList, StyleSheet, View , Modal, TextInput } from 'react-native';
+import { ActivityIndicator, Text, useTheme , FAB, Switch } from 'react-native-paper';
 
 export default function TimelineScreen() {
   const theme = useTheme();
