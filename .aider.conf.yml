@@ -10,6 +10,8 @@ auto-commits: true
 # 自分が書きかけのファイルがあっても止まらずにコミットする
 dirty-commits: true
 auto-accept-architect: true
+# アーキテクトモードをデフォルトで有効にする
+architect: true
 
 # ---------------------------------------------------------
 # UI・パフォーマンス最適化（おすすめ追加）
