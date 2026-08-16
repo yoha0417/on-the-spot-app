@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { ProtectedScreen } from '@/components/protected-screen';
 import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
@@ -76,6 +77,11 @@ export default function MapScreen() {
       setLoadingPlaceId(placeId);
       try {
         await checkIn(latitude, longitude, placeId);
+        Alert.alert(
+          '成功',
+          'チェックインに成功しました！',
+          [{ text: 'OK', onPress: () => router.push('/(tabs)/timeline') }]
+        );
       } catch (e) {
         const message = e instanceof Error ? e.message : 'チェックインに失敗しました';
         Alert.alert('エラー', message);
