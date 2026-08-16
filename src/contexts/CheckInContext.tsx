@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { checkIn as apiCheckIn, checkOut as apiCheckOut, sendHeartbeat as apiSendHeartbeat } from '@/services/checkinApi';
 import type { CheckInRecord } from '@/types/checkin';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 type CheckInContextValue = {
   currentCheckIn: CheckInRecord | null;
