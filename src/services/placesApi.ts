@@ -1,5 +1,5 @@
-import { apiClient } from '@/utils/apiClient';
 import type { NearbyResponse } from '@/types/place';
+import { apiClient } from '@/utils/apiClient';
 
 export async function fetchNearbyPlaces(
   lat: number,
@@ -7,6 +7,6 @@ export async function fetchNearbyPlaces(
   radius: number = 3000
 ): Promise<NearbyResponse> {
   return apiClient.get<NearbyResponse>(
-    `/api/places/nearby?lat=${lat}&lng=${lng}&radius=${radius}`
+    `/places/nearby?lat=${lat}&lng=${lng}&radius=${radius}`
   );
 }
