@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { Drawer as PaperDrawer, Text, useTheme } from 'react-native-paper';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
@@ -13,7 +13,7 @@ export default function CustomDrawerContent(props: Record<string, unknown>) {
   const settingsHref = '/settings';
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* ユーザー表示エリア */}
       <View style={styles.greetingContainer}>
         {isAuthenticated ? (
@@ -82,14 +82,13 @@ export default function CustomDrawerContent(props: Record<string, unknown>) {
           router.push('/explore');
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
   },
   greetingContainer: {
     paddingHorizontal: 16,
