@@ -3,9 +3,10 @@ import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
 import { checkIn, checkOut, getCurrentCheckIn } from '@/services/checkinApi';
 import type { CheckInRecord } from '@/types/checkin';
+import type { Place } from '@/types/place';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
-import MapView, { Callout, Marker, Region } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 import { Button, Text, useTheme } from 'react-native-paper';
 
 const CHECKIN_RADIUS = 5000;
@@ -39,6 +40,7 @@ export default function MapScreen() {
 
   const [currentCheckIn, setCurrentCheckIn] = useState<CheckInRecord | null>(null);
   const [loadingPlaceId, setLoadingPlaceId] = useState<string | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
   const region: Region = {
     latitude,
@@ -104,14 +106,6 @@ export default function MapScreen() {
           </Marker>
 
           {places.map((place) => {
-            const distance = getDistance(
-              { latitude, longitude },
-              { latitude: place.latitude, longitude: place.longitude }
-            );
-            const isCheckedIn = currentCheckIn?.placeId === place.id;
-            const isInRange = distance <= CHECKIN_RADIUS;
-            const isLoading = loadingPlaceId === place.id;
-
             return (
               <Marker
                 key={place.id}
@@ -122,58 +116,78 @@ export default function MapScreen() {
                 title={place.name}
                 description={place.address ?? undefined}
                 pinColor="red"
-              >
-                <Callout>
-                  <View style={styles.calloutContainer} pointerEvents="auto">
-                    <Text variant="titleSmall" style={styles.calloutTitle}>
-                      {place.name}
-                    </Text>
-                    {place.address && (
-                      <Text variant="bodySmall" style={styles.calloutAddress}>
-                        {place.address}
-                      </Text>
-                    )}
-                    <Text variant="bodySmall" style={styles.calloutDistance}>
-                      現在地から約{Math.floor(distance)}m
-                    </Text>
-
-                    {isCheckedIn ? (
-                      <Button
-                        mode="contained"
-                        onPress={() => handleCheckOut(place.id)}
-                        loading={isLoading}
-                        disabled={isLoading}
-                        buttonColor={theme.colors.error}
-                        textColor={theme.colors.onError}
-                        style={styles.calloutButton}
-                        labelStyle={styles.calloutButtonLabel}
-                      >
-                        チェックアウト
-                      </Button>
-                    ) : isInRange ? (
-                      <Button
-                        mode="contained"
-                        onPress={() => handleCheckIn(place.id)}
-                        loading={isLoading}
-                        disabled={isLoading}
-                        buttonColor="#10B981"
-                        textColor="#FFFFFF"
-                        style={styles.calloutButton}
-                        labelStyle={styles.calloutButtonLabel}
-                      >
-                        チェックイン
-                      </Button>
-                    ) : (
-                      <Text variant="bodySmall" style={styles.outOfRangeText}>
-                        チェックイン範囲外です（現在: 約{Math.floor(distance)}m）
-                      </Text>
-                    )}
-                  </View>
-                </Callout>
-              </Marker>
+                onPress={() => setSelectedPlace(place)}
+              />
             );
           })}
         </MapView>
+
+        {selectedPlace && (() => {
+          const distance = getDistance(
+            { latitude, longitude },
+            { latitude: selectedPlace.latitude, longitude: selectedPlace.longitude }
+          );
+          const isCheckedIn = currentCheckIn?.placeId === selectedPlace.id;
+          const isInRange = distance <= CHECKIN_RADIUS;
+          const isLoading = loadingPlaceId === selectedPlace.id;
+
+          return (
+            <View style={styles.selectedCard}>
+              <View style={styles.selectedCardHeader}>
+                <Text variant="titleMedium" style={styles.calloutTitle}>
+                  {selectedPlace.name}
+                </Text>
+                <Button
+                  mode="text"
+                  onPress={() => setSelectedPlace(null)}
+                  compact
+                >
+                  閉じる
+                </Button>
+              </View>
+              {selectedPlace.address && (
+                <Text variant="bodySmall" style={styles.calloutAddress}>
+                  {selectedPlace.address}
+                </Text>
+              )}
+              <Text variant="bodySmall" style={styles.calloutDistance}>
+                現在地から約{Math.floor(distance)}m
+              </Text>
+
+              {isCheckedIn ? (
+                <Button
+                  mode="contained"
+                  onPress={() => handleCheckOut(selectedPlace.id)}
+                  loading={isLoading}
+                  disabled={isLoading}
+                  buttonColor={theme.colors.error}
+                  textColor={theme.colors.onError}
+                  style={styles.calloutButton}
+                  labelStyle={styles.calloutButtonLabel}
+                >
+                  チェックアウト
+                </Button>
+              ) : isInRange ? (
+                <Button
+                  mode="contained"
+                  onPress={() => handleCheckIn(selectedPlace.id)}
+                  loading={isLoading}
+                  disabled={isLoading}
+                  buttonColor="#10B981"
+                  textColor="#FFFFFF"
+                  style={styles.calloutButton}
+                  labelStyle={styles.calloutButtonLabel}
+                >
+                  チェックイン
+                </Button>
+              ) : (
+                <Text variant="bodySmall" style={styles.outOfRangeText}>
+                  チェックイン範囲外です（現在: 約{Math.floor(distance)}m）
+                </Text>
+              )}
+            </View>
+          );
+        })()}
       </View>
     </ProtectedScreen>
   );
@@ -203,11 +217,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'white',
   },
-  calloutContainer: {
-    borderRadius: 8,
-    padding: 12,
-    minWidth: 200,
-    maxWidth: 280,
+  selectedCard: {
+    position: 'absolute',
+    bottom: 20,
+    left: 16,
+    right: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  selectedCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   calloutTitle: {
     fontWeight: 'bold',
