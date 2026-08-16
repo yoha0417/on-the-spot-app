@@ -4,5 +4,6 @@ export interface Post {
   placeId: string;
   content: string;
   createdAt: string;
-  // 必要に応じて他のフィールドを追加
+  userName: string;
+  stayDurationMinutes: number;
 }

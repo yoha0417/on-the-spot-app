@@ -5,7 +5,19 @@ import { fetchTimelinePosts , createPost } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View , Modal, TextInput } from 'react-native';
-import { ActivityIndicator, Button, Text, useTheme , FAB, Switch } from 'react-native-paper';
+import { ActivityIndicator, Avatar, Button, Text, useTheme , FAB, Switch } from 'react-native-paper';
+
+function formatStayDuration(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes}分`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (remainingMinutes === 0) {
+    return `${hours}時間`;
+  }
+  return `${hours}時間${remainingMinutes}分`;
+}
 
 export default function TimelineScreen() {
   const theme = useTheme();
@@ -110,7 +122,16 @@ export default function TimelineScreen() {
             }
             renderItem={({ item }) => (
               <View style={styles.postCard}>
-                <Text variant="bodyMedium">{item.content}</Text>
+                <View style={styles.postHeader}>
+                  <Avatar.Text size={40} label={item.userName.charAt(0)} />
+                  <View style={styles.postHeaderInfo}>
+                    <Text variant="labelLarge" style={styles.userName}>{item.userName}</Text>
+                    <Text variant="bodySmall" style={styles.stayDuration}>
+                      滞在時間: {formatStayDuration(item.stayDurationMinutes)}
+                    </Text>
+                  </View>
+                </View>
+                <Text variant="bodyMedium" style={styles.postContent}>{item.content}</Text>
                 <Text variant="bodySmall" style={styles.postMeta}>
                   {new Date(item.createdAt).toLocaleString()}
                 </Text>
@@ -198,18 +219,38 @@ const styles = StyleSheet.create({
   },
   postCard: {
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  postHeaderInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  userName: {
+    fontWeight: '600',
+  },
+  stayDuration: {
+    color: '#666',
+    marginTop: 2,
+  },
+  postContent: {
+    marginBottom: 8,
+    lineHeight: 22,
   },
   postMeta: {
-    color: '#888',
-    marginTop: 8,
+    color: '#aaa',
+    marginTop: 4,
   },
   fab: {
     position: 'absolute',
