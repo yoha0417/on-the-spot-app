@@ -4,10 +4,10 @@ import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
 import { checkIn, checkOut, getCurrentCheckIn } from '@/services/checkinApi';
 import type { CheckInRecord } from '@/types/checkin';
 import type { Place } from '@/types/place';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Button, IconButton, Text, useTheme } from 'react-native-paper';
 
 const CHECKIN_RADIUS = 1000;
 
@@ -31,6 +31,7 @@ function getDistance(
 
 export default function MapScreen() {
   const theme = useTheme();
+  const mapRef = useRef<MapView>(null);
   const { latitude, longitude } = useSimulatedLocation();
   const { places, error } = useNearbyPlaces({
     lat: latitude,
@@ -42,12 +43,24 @@ export default function MapScreen() {
   const [loadingPlaceId, setLoadingPlaceId] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
-  const region: Region = {
+  const [initialRegion] = useState<Region>(() => ({
     latitude,
     longitude,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
-  };
+  }));
+
+  const handleRecenter = useCallback(() => {
+    mapRef.current?.animateToRegion(
+      {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      500
+    );
+  }, [latitude, longitude]);
 
   useEffect(() => {
     if (error) {
@@ -100,7 +113,11 @@ export default function MapScreen() {
   return (
     <ProtectedScreen>
       <View style={styles.container}>
-        <MapView style={styles.map} region={region}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={initialRegion}
+        >
           <Marker coordinate={{ latitude, longitude }}>
             <View style={styles.userMarker} />
           </Marker>
@@ -188,6 +205,19 @@ export default function MapScreen() {
             </View>
           );
         })()}
+
+        <IconButton
+          mode="contained"
+          icon="crosshairs-gps"
+          onPress={handleRecenter}
+          style={[
+            styles.recenterButton,
+            selectedPlace ? styles.recenterButtonAboveCard : styles.recenterButtonBottom,
+          ]}
+          containerColor={theme.colors.primary}
+          iconColor={theme.colors.onPrimary}
+          accessibilityLabel="現在地に移動"
+        />
       </View>
     </ProtectedScreen>
   );
@@ -208,6 +238,18 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
+  },
+  recenterButton: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 10,
+    elevation: 6,
+  },
+  recenterButtonBottom: {
+    bottom: 24,
+  },
+  recenterButtonAboveCard: {
+    bottom: 200,
   },
   userMarker: {
     width: 24,
