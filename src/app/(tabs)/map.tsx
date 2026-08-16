@@ -134,7 +134,7 @@ export default function MapScreen() {
                       </Text>
                     )}
                     <Text variant="bodySmall" style={styles.calloutDistance}>
-                      現在地から約{distance}m
+                      現在地から約{Math.floor(distance)}m
                     </Text>
 
                     {isCheckedIn ? (
@@ -165,7 +165,7 @@ export default function MapScreen() {
                       </Button>
                     ) : (
                       <Text variant="bodySmall" style={styles.outOfRangeText}>
-                        チェックイン範囲外です（現在: 約{distance}m）
+                        チェックイン範囲外です（現在: 約{Math.floor(distance)}m）
                       </Text>
                     )}
                   </View>
