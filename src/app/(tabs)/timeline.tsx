@@ -5,7 +5,7 @@ import { fetchTimelinePosts , createPost } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View , Modal, TextInput } from 'react-native';
-import { ActivityIndicator, Text, useTheme , FAB, Switch } from 'react-native-paper';
+import { ActivityIndicator, Button, Text, useTheme , FAB, Switch } from 'react-native-paper';
 
 export default function TimelineScreen() {
   const theme = useTheme();
