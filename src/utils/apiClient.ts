@@ -56,12 +56,13 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     throw new Error(errorMessage);
   }
 
-  if (response.status === 204) {
+  const text = await response.text();
+
+  if (!text) {
     return undefined as unknown as T;
   }
 
-  const data: T = await response.json();
-  return data;
+  return JSON.parse(text) as T;
 }
 
 export const apiClient = {
