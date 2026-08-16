@@ -82,7 +82,7 @@ export async function loginUser(payload: LoginPayload): Promise<LoginResponse> {
 }
 
 export async function signUpUser(payload: SignUpPayload): Promise<LoginResponse> {
-  const data = await apiClient.post<LoginResponse>('/auth/signup', payload);
+  const data = await apiClient.post<LoginResponse>('/auth/register', payload);
   await storeToken(data.token);
   await saveUserName(data.user.name);
   return data;
