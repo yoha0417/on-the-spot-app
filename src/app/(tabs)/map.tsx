@@ -119,7 +119,7 @@ export default function MapScreen() {
                 }}
                 title={place.name}
                 description={place.address ?? undefined}
-                pinColor="red"
+                pinColor={currentCheckIn?.placeId === place.id ? '#10B981' : 'red'}
                 onPress={() => setSelectedPlace(place)}
               />
             );
