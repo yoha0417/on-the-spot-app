@@ -24,6 +24,7 @@ export default function TimelineScreen() {
   const { currentCheckIn } = useCheckIn();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [newContent, setNewContent] = useState('');
@@ -59,6 +60,20 @@ export default function TimelineScreen() {
       setSubmitting(false);
     }
   }, [currentCheckIn, newContent, isDelayedPublish]);
+
+  const handleRefresh = useCallback(async () => {
+    if (!currentCheckIn) return;
+    setRefreshing(true);
+    try {
+      const data = await fetchTimelinePosts(currentCheckIn.placeId);
+      setPosts(data.posts);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '投稿の更新に失敗しました';
+      Alert.alert('エラー', message);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [currentCheckIn]);
 
   useEffect(() => {
     if (!currentCheckIn) {
@@ -116,6 +131,8 @@ export default function TimelineScreen() {
             data={posts}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
             ListEmptyComponent={
               <View style={styles.centered}>
                 <Text>まだ投稿がありません</Text>
