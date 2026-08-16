@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8787/api';
 const AUTH_TOKEN_KEY = 'user_token';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
