@@ -1,0 +1,22 @@
+export type CheckInStatus = 'active' | 'ended';
+
+export interface CheckInRecord {
+  id: string;
+  placeId: string;
+  userId: string;
+  checkInTime: string;
+  checkOutTime: string | null;
+  status: CheckInStatus;
+}
+
+export interface CheckInResponse {
+  checkIn: CheckInRecord;
+}
+
+export interface CheckOutResponse {
+  checkIn: CheckInRecord;
+}
+
+export interface CurrentCheckInResponse {
+  checkIn: CheckInRecord | null;
+}
