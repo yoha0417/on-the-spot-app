@@ -1,4 +1,4 @@
-import { CustomDrawerContent } from '@/components/custom-drawer-content';
+import CustomDrawerContent from '@/components/custom-drawer-content';
 import { theme } from '@/constants/theme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Drawer } from 'expo-router/drawer';
