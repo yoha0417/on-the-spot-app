@@ -1,7 +1,7 @@
 import { ProtectedScreen } from '@/components/protected-screen';
 import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
-import { checkIn, checkOut, getCurrentCheckIn } from '@/services/checkinApi';
+import { checkIn, checkOut } from '@/services/checkinApi';
 import type { CheckInRecord } from '@/types/checkin';
 import type { Place } from '@/types/place';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -67,19 +67,6 @@ export default function MapScreen() {
       console.error(error);
     }
   }, [error]);
-
-  // 現在のチェックイン状態を取得
-  useEffect(() => {
-    const fetchCurrentCheckIn = async () => {
-      try {
-        const res = await getCurrentCheckIn();
-        setCurrentCheckIn(res.checkIn);
-      } catch {
-        // 未チェックインまたはエラー時は null のまま
-      }
-    };
-    fetchCurrentCheckIn();
-  }, []);
 
   const handleCheckIn = useCallback(
     async (placeId: string) => {
