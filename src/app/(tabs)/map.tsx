@@ -123,8 +123,8 @@ export default function MapScreen() {
                 description={place.address ?? undefined}
                 pinColor="red"
               >
-                <Callout tooltip>
-                  <View style={styles.calloutContainer}>
+                <Callout>
+                  <View style={styles.calloutContainer} pointerEvents="auto">
                     <Text variant="titleSmall" style={styles.calloutTitle}>
                       {place.name}
                     </Text>
@@ -204,16 +204,10 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   calloutContainer: {
-    backgroundColor: 'white',
     borderRadius: 8,
     padding: 12,
     minWidth: 200,
     maxWidth: 280,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 4,
   },
   calloutTitle: {
     fontWeight: 'bold',
