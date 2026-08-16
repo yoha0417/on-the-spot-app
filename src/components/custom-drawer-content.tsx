@@ -18,7 +18,7 @@ export default function CustomDrawerContent(props: Record<string, unknown>) {
       <View style={styles.greetingContainer}>
         {isAuthenticated ? (
           <>
-            <Text variant="subtitle" style={styles.greetingText}>
+            <Text variant="titleMedium" style={styles.greetingText}>
               こんにちは、{userName}さん
             </Text>
             <PaperDrawer.Item
@@ -31,7 +31,7 @@ export default function CustomDrawerContent(props: Record<string, unknown>) {
           </>
         ) : (
           <>
-            <Text variant="subtitle" style={styles.greetingText}>
+            <Text variant="titleMedium" style={styles.greetingText}>
               ログインしてください
             </Text>
             <PaperDrawer.Item
