@@ -1,8 +1,7 @@
 import { ProtectedScreen } from '@/components/protected-screen';
 import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
-import { checkIn, checkOut } from '@/services/checkinApi';
-import type { CheckInRecord } from '@/types/checkin';
+import { useCheckIn } from '@/contexts/CheckInContext';
 import type { Place } from '@/types/place';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
@@ -39,7 +38,7 @@ export default function MapScreen() {
     radius: 3000,
   });
 
-  const [currentCheckIn, setCurrentCheckIn] = useState<CheckInRecord | null>(null);
+  const { currentCheckIn, checkIn, checkOut } = useCheckIn();
   const [loadingPlaceId, setLoadingPlaceId] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
@@ -72,8 +71,7 @@ export default function MapScreen() {
     async (placeId: string) => {
       setLoadingPlaceId(placeId);
       try {
-        const res = await checkIn(latitude, longitude, placeId);
-        setCurrentCheckIn(res.checkIn);
+        await checkIn(latitude, longitude, placeId);
       } catch (e) {
         const message = e instanceof Error ? e.message : 'チェックインに失敗しました';
         Alert.alert('エラー', message);
@@ -81,21 +79,23 @@ export default function MapScreen() {
         setLoadingPlaceId(null);
       }
     },
-    [latitude, longitude]
+    [checkIn, latitude, longitude]
   );
 
-  const handleCheckOut = useCallback(async (placeId: string) => {
-    setLoadingPlaceId(placeId);
-    try {
-      await checkOut(placeId);
-      setCurrentCheckIn(null);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'チェックアウトに失敗しました';
-      Alert.alert('エラー', message);
-    } finally {
-      setLoadingPlaceId(null);
-    }
-  }, []);
+  const handleCheckOut = useCallback(
+    async (placeId: string) => {
+      setLoadingPlaceId(placeId);
+      try {
+        await checkOut(placeId);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'チェックアウトに失敗しました';
+        Alert.alert('エラー', message);
+      } finally {
+        setLoadingPlaceId(null);
+      }
+    },
+    [checkOut]
+  );
 
   return (
     <ProtectedScreen>
