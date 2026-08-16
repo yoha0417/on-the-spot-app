@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import type { Place } from '@/types/place';
 import { fetchNearbyPlaces } from '@/services/placesApi';
+import type { Place } from '@/types/place';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseNearbyPlacesProps {
   lat: number;
@@ -38,7 +38,7 @@ export function useNearbyPlaces({ lat, lng, radius = 3000 }: UseNearbyPlacesProp
     };
 
     fetchData();
-    const intervalId = setInterval(fetchData, 5000);
+    const intervalId = setInterval(fetchData, 10000);
 
     return () => clearInterval(intervalId);
   }, []);
