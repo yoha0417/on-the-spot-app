@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Drawer as PaperDrawer, Text, useTheme } from 'react-native-paper';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
