@@ -1,9 +1,9 @@
-import 'react-native-gesture-handler';
-import { Drawer } from 'expo-router/drawer';
-import { PaperProvider } from 'react-native-paper';
-import { theme } from '@/constants/theme';
 import { CustomDrawerContent } from '@/components/custom-drawer-content';
+import { theme } from '@/constants/theme';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { Drawer } from 'expo-router/drawer';
+import 'react-native-gesture-handler';
+import { PaperProvider } from 'react-native-paper';
 
 export default function RootLayout() {
   return (
