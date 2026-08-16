@@ -14,7 +14,7 @@ export interface CheckInResponse {
 }
 
 export interface CheckOutResponse {
-  checkIn: CheckInRecord;
+  success: boolean;
 }
 
 export interface CurrentCheckInResponse {
