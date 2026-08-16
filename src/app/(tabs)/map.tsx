@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Alert } from 'react-native';
-import MapView, { Marker, Callout, Region } from 'react-native-maps';
-import { Text, Button, useTheme } from 'react-native-paper';
-import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
-import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { ProtectedScreen } from '@/components/protected-screen';
+import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
+import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
 import { checkIn, checkOut, getCurrentCheckIn } from '@/services/checkinApi';
 import type { CheckInRecord } from '@/types/checkin';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import MapView, { Callout, Marker, Region } from 'react-native-maps';
+import { Button, Text, useTheme } from 'react-native-paper';
 
-const CHECKIN_RADIUS = 50;
+const CHECKIN_RADIUS = 5000;
 
 function getDistance(
   coord1: { latitude: number; longitude: number },
