@@ -42,12 +42,13 @@ export default function TimelineScreen() {
     if (!currentCheckIn || !newContent.trim()) return;
     setSubmitting(true);
     try {
-      const response = await createPost({
+      await createPost({
         content: newContent.trim(),
         placeId: currentCheckIn.placeId,
         is_delayed_publish: isDelayedPublish,
       });
-      setPosts((prev) => [response.post, ...prev]);
+      const data = await fetchTimelinePosts(currentCheckIn.placeId);
+      setPosts(data.posts);
       setNewContent('');
       setIsDelayedPublish(false);
       setModalVisible(false);
