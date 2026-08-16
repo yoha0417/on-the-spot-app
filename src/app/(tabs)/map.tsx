@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
 import MapView, { Marker, Callout, Region } from 'react-native-maps';
 import { Text, Button, useTheme } from 'react-native-paper';
-import { getDistance } from 'geolib';
 import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
 import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { ProtectedScreen } from '@/components/protected-screen';
@@ -10,6 +9,24 @@ import { checkIn, checkOut, getCurrentCheckIn } from '@/services/checkinApi';
 import type { CheckInRecord } from '@/types/checkin';
 
 const CHECKIN_RADIUS = 50;
+
+function getDistance(
+  coord1: { latitude: number; longitude: number },
+  coord2: { latitude: number; longitude: number }
+): number {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const R = 6371000; // meters
+  const dLat = toRad(coord2.latitude - coord1.latitude);
+  const dLon = toRad(coord2.longitude - coord1.longitude);
+  const lat1 = toRad(coord1.latitude);
+  const lat2 = toRad(coord2.latitude);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 export default function MapScreen() {
   const theme = useTheme();
@@ -42,7 +59,7 @@ export default function MapScreen() {
       try {
         const res = await getCurrentCheckIn();
         setCurrentCheckIn(res.checkIn);
-      } catch (_e) {
+      } catch {
         // 未チェックインまたはエラー時は null のまま
       }
     };
