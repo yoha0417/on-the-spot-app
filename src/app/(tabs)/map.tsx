@@ -9,7 +9,7 @@ import { Alert, StyleSheet, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Button, Text, useTheme } from 'react-native-paper';
 
-const CHECKIN_RADIUS = 5000;
+const CHECKIN_RADIUS = 1000;
 
 function getDistance(
   coord1: { latitude: number; longitude: number },
