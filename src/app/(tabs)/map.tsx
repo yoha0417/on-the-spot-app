@@ -2,6 +2,7 @@ import { ProtectedScreen } from '@/components/protected-screen';
 import { useNearbyPlaces } from '@/hooks/useNearbyPlaces';
 import { useSimulatedLocation } from '@/hooks/useSimulatedLocation';
 import { useCheckIn } from '@/contexts/CheckInContext';
+import { useCheckInHeartbeat } from '@/hooks/useCheckInHeartbeat';
 import type { Place } from '@/types/place';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
@@ -32,6 +33,9 @@ export default function MapScreen() {
   const theme = useTheme();
   const mapRef = useRef<MapView>(null);
   const { latitude, longitude } = useSimulatedLocation();
+
+  useCheckInHeartbeat({ lat: latitude, lng: longitude });
+
   const { places, error } = useNearbyPlaces({
     lat: latitude,
     lng: longitude,

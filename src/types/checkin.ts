@@ -20,3 +20,19 @@ export interface CheckOutResponse {
 export interface CurrentCheckInResponse {
   checkIn: CheckInRecord | null;
 }
+
+export interface HeartbeatRequest {
+  lat: number;
+  lng: number;
+  placeId: string;
+}
+
+export type HeartbeatResponse =
+  | {
+      success: true;
+    }
+  | {
+      success: false;
+      status: 'checked_out';
+      message: string;
+    };

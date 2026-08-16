@@ -1,4 +1,8 @@
-import type { CheckInRecord, CheckOutResponse } from '@/types/checkin';
+import type {
+  CheckInRecord,
+  CheckOutResponse,
+  HeartbeatResponse,
+} from '@/types/checkin';
 import { apiClient } from '@/utils/apiClient';
 
 type UnknownRecord = Record<string, unknown>;
@@ -58,4 +62,16 @@ export async function checkIn(
 
 export async function checkOut(placeId: string): Promise<CheckOutResponse> {
   return apiClient.post<CheckOutResponse>('/checkout', { placeId });
+}
+
+export async function sendHeartbeat(
+  lat: number,
+  lng: number,
+  placeId: string,
+): Promise<HeartbeatResponse> {
+  return apiClient.post<HeartbeatResponse>('/heartbeat', {
+    lat,
+    lng,
+    placeId,
+  });
 }
