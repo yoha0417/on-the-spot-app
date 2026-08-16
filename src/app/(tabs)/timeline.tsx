@@ -1,10 +1,17 @@
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Text, useTheme } from 'react-native-paper';
+import { ProtectedScreen } from '@/components/protected-screen';
 
 export default function TimelineScreen() {
+  const theme = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>タイムライン画面</Text>
-    </View>
+    <ProtectedScreen>
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <Text style={styles.text}>タイムライン画面</Text>
+      </View>
+    </ProtectedScreen>
   );
 }
 
@@ -13,10 +20,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   text: {
     fontSize: 18,
-    fontWeight: 'bold',
   },
 });

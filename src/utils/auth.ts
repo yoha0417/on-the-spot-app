@@ -1,9 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
+import { apiClient } from './apiClient';
 
-const AUTH_TOKEN_KEY = 'authToken';
-const USER_NAME_KEY = 'userName';
+const AUTH_TOKEN_KEY = 'user_token';
+const USER_NAME_KEY = 'user_name';
 
 export type AuthToken = string | null;
+
+// -------------- token management --------------
 
 export async function storeToken(token: AuthToken): Promise<void> {
   if (token) {
@@ -14,8 +17,6 @@ export async function storeToken(token: AuthToken): Promise<void> {
 }
 
 export function getToken(): AuthToken {
-  // SecureStore is synchronous only with getItem, but on some platforms it may throw if not available.
-  // We use a sync wrapper for convenience; the actual retrieval on app start will use asynchronous version.
   try {
     return SecureStore.getItem(AUTH_TOKEN_KEY);
   } catch {
@@ -31,27 +32,11 @@ export async function getTokenAsync(): Promise<AuthToken> {
   }
 }
 
-export async function simulateLogin(
-  username: string,
-  password: string,
-): Promise<{ token: string; userName: string }> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (username.length > 0 && password.length > 0) {
-        const token = `token_${username}_${Date.now()}`;
-        // ユーザー名は入力されたものをそのまま保存（実際のAPIではレスポンスから取得）
-        const userName = username;
-        resolve({ token, userName });
-      } else {
-        reject(new Error('ユーザー名またはパスワードが空です'));
-      }
-    }, 800);
-  });
-}
-
 export async function removeToken(): Promise<void> {
   await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
 }
+
+// -------------- user name management --------------
 
 export async function saveUserName(name: string): Promise<void> {
   await SecureStore.setItemAsync(USER_NAME_KEY, name);
@@ -67,4 +52,38 @@ export async function getUserName(): Promise<string | null> {
 
 export async function removeUserName(): Promise<void> {
   await SecureStore.deleteItemAsync(USER_NAME_KEY);
+}
+
+// -------------- API --------------
+
+interface LoginResponse {
+  token: string;
+  user: {
+    name: string;
+  };
+}
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+interface SignUpPayload {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export async function loginUser(payload: LoginPayload): Promise<LoginResponse> {
+  const data = await apiClient.post<LoginResponse>('/auth/login', payload);
+  await storeToken(data.token);
+  await saveUserName(data.user.name);
+  return data;
+}
+
+export async function signUpUser(payload: SignUpPayload): Promise<LoginResponse> {
+  const data = await apiClient.post<LoginResponse>('/auth/signup', payload);
+  await storeToken(data.token);
+  await saveUserName(data.user.name);
+  return data;
 }
