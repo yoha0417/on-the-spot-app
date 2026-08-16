@@ -6,6 +6,9 @@ import type { Post } from '@/types/post';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Text, useTheme } from 'react-native-paper';
+import { Modal, TextInput } from 'react-native';
+import { FAB, Switch } from 'react-native-paper';
+import { createPost } from '@/services/timelineApi';
 
 export default function TimelineScreen() {
   const theme = useTheme();
@@ -13,6 +16,10 @@ export default function TimelineScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newContent, setNewContent] = useState('');
+  const [isDelayedPublish, setIsDelayedPublish] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const redirectToMap = useCallback(() => {
     Alert.alert(
@@ -21,6 +28,27 @@ export default function TimelineScreen() {
       [{ text: 'OK', onPress: () => router.replace('/(tabs)/map') }]
     );
   }, []);
+
+  const handleCreatePost = useCallback(async () => {
+    if (!currentCheckIn || !newContent.trim()) return;
+    setSubmitting(true);
+    try {
+      const response = await createPost({
+        content: newContent.trim(),
+        placeId: currentCheckIn.placeId,
+        is_delayed_publish: isDelayedPublish,
+      });
+      setPosts((prev) => [response.post, ...prev]);
+      setNewContent('');
+      setIsDelayedPublish(false);
+      setModalVisible(false);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '投稿に失敗しました';
+      Alert.alert('エラー', message);
+    } finally {
+      setSubmitting(false);
+    }
+  }, [currentCheckIn, newContent, isDelayedPublish]);
 
   useEffect(() => {
     if (!currentCheckIn) {
@@ -94,6 +122,62 @@ export default function TimelineScreen() {
           />
         )}
       </View>
+
+      <FAB
+        icon="plus"
+        style={styles.fab}
+        onPress={() => setModalVisible(true)}
+        visible={!modalVisible}
+      />
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Text variant="headlineSmall" style={styles.modalTitle}>
+            新規投稿
+          </Text>
+
+          <TextInput
+            style={styles.textInput}
+            placeholder="いまどうしてる？"
+            value={newContent}
+            onChangeText={setNewContent}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+
+          <View style={styles.switchRow}>
+            <Text>遅延公開</Text>
+            <Switch
+              value={isDelayedPublish}
+              onValueChange={setIsDelayedPublish}
+            />
+          </View>
+
+          <View style={styles.modalActions}>
+            <Button
+              mode="outlined"
+              onPress={() => setModalVisible(false)}
+              disabled={submitting}
+            >
+              キャンセル
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleCreatePost}
+              loading={submitting}
+              disabled={submitting || !newContent.trim()}
+            >
+              投稿する
+            </Button>
+          </View>
+        </View>
+      </Modal>
     </ProtectedScreen>
   );
 }
@@ -129,5 +213,37 @@ const styles = StyleSheet.create({
   postMeta: {
     color: '#888',
     marginTop: 8,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  textInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    minHeight: 120,
+    marginBottom: 16,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
 });

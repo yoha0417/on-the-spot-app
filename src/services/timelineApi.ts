@@ -9,3 +9,18 @@ interface TimelineResponse {
 export async function fetchTimelinePosts(placeId: string): Promise<TimelineResponse> {
   return apiClient.get<TimelineResponse>(`/posts?placeId=${encodeURIComponent(placeId)}`);
 }
+
+interface CreatePostRequest {
+  content: string;
+  placeId: string;
+  is_delayed_publish: boolean;
+}
+
+interface CreatePostResponse {
+  success: true;
+  post: Post;
+}
+
+export async function createPost(data: CreatePostRequest): Promise<CreatePostResponse> {
+  return apiClient.post<CreatePostResponse>('/posts', data);
+}
