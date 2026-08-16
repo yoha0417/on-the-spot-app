@@ -123,9 +123,9 @@ export default function TimelineScreen() {
             renderItem={({ item }) => (
               <View style={styles.postCard}>
                 <View style={styles.postHeader}>
-                  <Avatar.Text size={40} label={item.userName.charAt(0)} />
+                  <Avatar.Text size={40} label={(item.userName ?? '?').charAt(0)} />
                   <View style={styles.postHeaderInfo}>
-                    <Text variant="labelLarge" style={styles.userName}>{item.userName}</Text>
+                    <Text variant="labelLarge" style={styles.userName}>{item.userName ?? '不明'}</Text>
                     <Text variant="bodySmall" style={styles.stayDuration}>
                       滞在時間: {formatStayDuration(item.stayDurationMinutes)}
                     </Text>
