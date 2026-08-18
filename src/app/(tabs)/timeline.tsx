@@ -231,6 +231,11 @@ export default function TimelineScreen() {
                     </View>
                   </View>
                   <Text variant="bodyMedium" style={styles.postContent}>{item.content}</Text>
+                  {item.isWaitingForUnlock && (
+                    <Text variant="bodySmall" style={styles.lockMessage}>
+                      🔒 この投稿はあなたがチェックアウトしてから30分後に他の人から見えます。
+                    </Text>
+                  )}
                   <View style={styles.postFooter}>
                     <Text variant="bodySmall" style={styles.postMeta}>
                       {new Date(item.createdAt).toLocaleString()}
@@ -365,6 +370,11 @@ const styles = StyleSheet.create({
   postContent: {
     marginBottom: 8,
     lineHeight: 22,
+  },
+  lockMessage: {
+    color: '#888',
+    marginBottom: 8,
+    fontStyle: 'italic',
   },
   postMeta: {
     color: '#aaa',

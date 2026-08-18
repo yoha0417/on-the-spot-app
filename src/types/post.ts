@@ -8,4 +8,5 @@ export interface Post {
   stayDurationMinutes: number;
   likesCount: number;
   isLiked: boolean;
+  isWaitingForUnlock: boolean;
 }
