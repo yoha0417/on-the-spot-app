@@ -26,24 +26,36 @@ export default function AccountScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPosts = useCallback(async () => {
+  useEffect(() => {
     if (!userId) return;
 
-    try {
-      const data = await fetchUserPosts(userId);
-      setPosts(data.posts);
-      setError(null);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : '投稿の取得に失敗しました';
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
+    let cancelled = false;
 
-  useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
+    const loadInitialPosts = async () => {
+      try {
+        const data = await fetchUserPosts(userId);
+        if (!cancelled) {
+          setPosts(data.posts);
+          setError(null);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : '投稿の取得に失敗しました';
+          setError(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadInitialPosts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const handleRefresh = useCallback(async () => {
     if (!userId) return;
