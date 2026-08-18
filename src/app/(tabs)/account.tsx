@@ -29,11 +29,10 @@ export default function AccountScreen() {
   const loadPosts = useCallback(async () => {
     if (!userId) return;
 
-    setLoading(true);
-    setError(null);
     try {
       const data = await fetchUserPosts(userId);
       setPosts(data.posts);
+      setError(null);
     } catch (e) {
       const message = e instanceof Error ? e.message : '投稿の取得に失敗しました';
       setError(message);
