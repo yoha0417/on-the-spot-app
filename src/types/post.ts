@@ -6,4 +6,6 @@ export interface Post {
   createdAt: string;
   userName: string;
   stayDurationMinutes: number;
+  likesCount: number;
+  isLiked: boolean;
 }

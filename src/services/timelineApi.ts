@@ -24,3 +24,12 @@ interface CreatePostResponse {
 export async function createPost(data: CreatePostRequest): Promise<CreatePostResponse> {
   return apiClient.post<CreatePostResponse>('/posts', data);
 }
+
+interface ToggleLikeResponse {
+  success: true;
+  likesCount: number;
+}
+
+export async function toggleLike(postId: string): Promise<ToggleLikeResponse> {
+  return apiClient.post<ToggleLikeResponse>(`/posts/${encodeURIComponent(postId)}/like`);
+}

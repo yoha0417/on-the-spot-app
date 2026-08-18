@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useCheckIn } from '@/contexts/CheckInContext';
 import { ProtectedScreen } from '@/components/protected-screen';
-import { fetchTimelinePosts , createPost } from '@/services/timelineApi';
+import { fetchTimelinePosts, createPost, toggleLike } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, View , Modal, TextInput } from 'react-native';
-import { ActivityIndicator, Avatar, Button, Text, useTheme , FAB, Switch } from 'react-native-paper';
+import { Alert, FlatList, StyleSheet, View, Modal, TextInput } from 'react-native';
+import { ActivityIndicator, Avatar, Button, Text, useTheme, FAB, Switch } from 'react-native-paper';
 
 function formatStayDuration(minutes: number): string {
   if (minutes < 60) {
@@ -60,6 +60,47 @@ export default function TimelineScreen() {
       setSubmitting(false);
     }
   }, [currentCheckIn, newContent, isDelayedPublish]);
+
+  const handleToggleLike = useCallback(async (postId: string) => {
+    const originalPost = posts.find(p => p.id === postId);
+    if (!originalPost) return;
+
+    const wasLiked = originalPost.isLiked;
+    const originalLikesCount = originalPost.likesCount;
+
+    // Optimistic update
+    setPosts(prev => prev.map(p => {
+      if (p.id !== postId) return p;
+      return {
+        ...p,
+        isLiked: !wasLiked,
+        likesCount: wasLiked ? originalLikesCount - 1 : originalLikesCount + 1,
+      };
+    }));
+
+    try {
+      const result = await toggleLike(postId);
+      setPosts(prev => prev.map(p => {
+        if (p.id !== postId) return p;
+        return {
+          ...p,
+          likesCount: result.likesCount,
+        };
+      }));
+    } catch (e) {
+      // Rollback on failure
+      setPosts(prev => prev.map(p => {
+        if (p.id !== postId) return p;
+        return {
+          ...p,
+          isLiked: wasLiked,
+          likesCount: originalLikesCount,
+        };
+      }));
+      const message = e instanceof Error ? e.message : 'いいねに失敗しました';
+      Alert.alert('エラー', message);
+    }
+  }, [posts]);
 
   const handleRefresh = useCallback(async () => {
     if (!currentCheckIn) return;
@@ -150,9 +191,20 @@ export default function TimelineScreen() {
                   </View>
                 </View>
                 <Text variant="bodyMedium" style={styles.postContent}>{item.content}</Text>
-                <Text variant="bodySmall" style={styles.postMeta}>
-                  {new Date(item.createdAt).toLocaleString()}
-                </Text>
+                <View style={styles.postFooter}>
+                  <Text variant="bodySmall" style={styles.postMeta}>
+                    {new Date(item.createdAt).toLocaleString()}
+                  </Text>
+                  <Button
+                    mode="text"
+                    icon={item.isLiked ? 'heart' : 'heart-outline'}
+                    textColor={item.isLiked ? '#e0245e' : '#aaa'}
+                    onPress={() => handleToggleLike(item.id)}
+                    compact
+                  >
+                    {item.likesCount > 0 ? item.likesCount : ''}
+                  </Button>
+                </View>
               </View>
             )}
           />
@@ -268,6 +320,12 @@ const styles = StyleSheet.create({
   },
   postMeta: {
     color: '#aaa',
+    marginTop: 4,
+  },
+  postFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 4,
   },
   fab: {
