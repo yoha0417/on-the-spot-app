@@ -2,6 +2,7 @@ import { ProtectedScreen } from '@/components/protected-screen';
 import { useCheckIn } from '@/contexts/CheckInContext';
 import { createPost, fetchTimelinePosts, toggleLike } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
+import { formatLocalDateTime } from '@/utils/date';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, Modal, StyleSheet, TextInput, View } from 'react-native';
@@ -238,7 +239,7 @@ export default function TimelineScreen() {
                   ) : null}
                   <View style={styles.postFooter}>
                     <Text variant="bodySmall" style={styles.postMeta}>
-                      {new Date(item.createdAt).toLocaleString()}
+                      {formatLocalDateTime(item.createdAt)}
                     </Text>
                     <Button
                       mode="text"

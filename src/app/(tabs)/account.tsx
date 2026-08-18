@@ -4,6 +4,7 @@ import { fetchUserPosts } from '@/services/timelineApi';
 import { fetchUserVisits } from '@/services/visitsApi';
 import type { Post } from '@/types/post';
 import type { VisitWithPlace } from '@/types/visit';
+import { formatLocalDateTime } from '@/utils/date';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Avatar, SegmentedButtons, Text, useTheme } from 'react-native-paper';
@@ -174,7 +175,7 @@ export default function AccountScreen() {
 
                     <View style={styles.postFooter}>
                       <Text variant="bodySmall" style={styles.postMeta}>
-                        {new Date(item.createdAt).toLocaleString()}
+                        {formatLocalDateTime(item.createdAt)}
                       </Text>
                       <Text variant="bodySmall" style={styles.postMeta}>
                         ❤️ {item.likesCount}
@@ -223,11 +224,11 @@ export default function AccountScreen() {
                     ) : null}
                     <View style={styles.visitTimes}>
                       <Text variant="bodySmall" style={styles.visitTime}>
-                        チェックイン: {new Date(item.checkedInAt).toLocaleString()}
+                        チェックイン: {formatLocalDateTime(item.checkedInAt)}
                       </Text>
                       {item.checkedOutAt ? (
                         <Text variant="bodySmall" style={styles.visitTime}>
-                          チェックアウト: {new Date(item.checkedOutAt).toLocaleString()}
+                          チェックアウト: {formatLocalDateTime(item.checkedOutAt)}
                         </Text>
                       ) : (
                         <Text variant="bodySmall" style={styles.visitTime}>
