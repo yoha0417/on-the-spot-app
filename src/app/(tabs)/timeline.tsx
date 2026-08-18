@@ -239,7 +239,7 @@ export default function TimelineScreen() {
                   ) : null}
                   <View style={styles.postFooter}>
                     <Text variant="bodySmall" style={styles.postMeta}>
-                      {formatLocalDateTime(item.createdAt)}
+                      {formatLocalDateTime(item.createdAt.replace(' ', 'T') + 'Z')}
                     </Text>
                     <Button
                       mode="text"
