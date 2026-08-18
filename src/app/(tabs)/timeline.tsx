@@ -247,7 +247,7 @@ export default function TimelineScreen() {
                       onPress={() => handleToggleLike(item.id)}
                       compact
                     >
-                      {item.likesCount > 0 ? item.likesCount : ''}
+                      {item.likesCount > 0 ? item.likesCount : null}
                     </Button>
                   </View>
                 </View>
