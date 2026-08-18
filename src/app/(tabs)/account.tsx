@@ -175,7 +175,7 @@ export default function AccountScreen() {
 
                     <View style={styles.postFooter}>
                       <Text variant="bodySmall" style={styles.postMeta}>
-                        {formatLocalDateTime(item.createdAt)}
+                        {formatLocalDateTime(item.createdAt.replace(' ', 'T') + 'Z')}
                       </Text>
                       <Text variant="bodySmall" style={styles.postMeta}>
                         ❤️ {item.likesCount}
