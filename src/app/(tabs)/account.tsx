@@ -1,10 +1,12 @@
 import { ProtectedScreen } from '@/components/protected-screen';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchUserPosts } from '@/services/timelineApi';
+import { fetchUserVisits } from '@/services/visitsApi';
 import type { Post } from '@/types/post';
+import type { VisitWithPlace } from '@/types/visit';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Avatar, Text, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Avatar, SegmentedButtons, Text, useTheme } from 'react-native-paper';
 
 function formatStayDuration(minutes: number): string {
   if (minutes < 60) {
@@ -25,6 +27,9 @@ export default function AccountScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<'posts' | 'visits'>('posts');
+  const [visits, setVisits] = useState<VisitWithPlace[]>([]);
+  const [visitsLoading, setVisitsLoading] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -57,6 +62,37 @@ export default function AccountScreen() {
     };
   }, [userId]);
 
+  useEffect(() => {
+    if (tab !== 'visits' || !userId) return;
+
+    let cancelled = false;
+
+    const loadVisits = async () => {
+      setVisitsLoading(true);
+      try {
+        const data = await fetchUserVisits(userId);
+        if (!cancelled) {
+          setVisits(data.visits);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          const message = e instanceof Error ? e.message : '訪問履歴の取得に失敗しました';
+          setError(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setVisitsLoading(false);
+        }
+      }
+    };
+
+    loadVisits();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, userId]);
+
   const handleRefresh = useCallback(async () => {
     if (!userId) return;
 
@@ -82,59 +118,131 @@ export default function AccountScreen() {
           </Text>
         </View>
 
-        {loading && (
-          <View style={styles.centered}>
-            <ActivityIndicator size="large" />
-          </View>
-        )}
+        <SegmentedButtons
+          value={tab}
+          onValueChange={(value) => setTab(value as 'posts' | 'visits')}
+          buttons={[
+            { value: 'posts', label: '投稿' },
+            { value: 'visits', label: 'チェックイン履歴' },
+          ]}
+          style={styles.tabBar}
+        />
 
-        {!loading && error && (
-          <View style={styles.centered}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
-
-        {!loading && !error && (
-          <FlatList
-            data={posts}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listContent}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            ListEmptyComponent={
+        {tab === 'posts' && (
+          <>
+            {loading && (
               <View style={styles.centered}>
-                <Text>まだ投稿がありません</Text>
+                <ActivityIndicator size="large" />
               </View>
-            }
-            renderItem={({ item }) => (
-              <View style={styles.postCard}>
-                <View style={styles.postHeader}>
-                  <Avatar.Text size={40} label={(item.userName ?? '?').charAt(0)} />
-                  <View style={styles.postHeaderInfo}>
-                    <Text variant="labelLarge" style={styles.userName}>
-                      {item.userName ?? '不明'}
+            )}
+
+            {!loading && error && (
+              <View style={styles.centered}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            {!loading && !error && (
+              <FlatList
+                data={posts}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.listContent}
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                ListEmptyComponent={
+                  <View style={styles.centered}>
+                    <Text>まだ投稿がありません</Text>
+                  </View>
+                }
+                renderItem={({ item }) => (
+                  <View style={styles.postCard}>
+                    <View style={styles.postHeader}>
+                      <Avatar.Text size={40} label={(item.userName ?? '?').charAt(0)} />
+                      <View style={styles.postHeaderInfo}>
+                        <Text variant="labelLarge" style={styles.userName}>
+                          {item.userName ?? '不明'}
+                        </Text>
+                        <Text variant="bodySmall" style={styles.stayDuration}>
+                          滞在時間: {formatStayDuration(item.stayDurationMinutes)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Text variant="bodyMedium" style={styles.postContent}>
+                      {item.content}
                     </Text>
+
+                    <View style={styles.postFooter}>
+                      <Text variant="bodySmall" style={styles.postMeta}>
+                        {new Date(item.createdAt).toLocaleString()}
+                      </Text>
+                      <Text variant="bodySmall" style={styles.postMeta}>
+                        ❤️ {item.likesCount}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              />
+            )}
+          </>
+        )}
+
+        {tab === 'visits' && (
+          <>
+            {visitsLoading && (
+              <View style={styles.centered}>
+                <ActivityIndicator size="large" />
+              </View>
+            )}
+
+            {!visitsLoading && error && (
+              <View style={styles.centered}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            {!visitsLoading && !error && (
+              <FlatList
+                data={visits}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.listContent}
+                ListEmptyComponent={
+                  <View style={styles.centered}>
+                    <Text>まだ訪問履歴がありません</Text>
+                  </View>
+                }
+                renderItem={({ item }) => (
+                  <View style={styles.visitCard}>
+                    <Text variant="titleMedium" style={styles.placeName}>
+                      {item.placeName}
+                    </Text>
+                    {item.placeAddress ? (
+                      <Text variant="bodySmall" style={styles.visitAddress}>
+                        {item.placeAddress}
+                      </Text>
+                    ) : null}
+                    <View style={styles.visitTimes}>
+                      <Text variant="bodySmall" style={styles.visitTime}>
+                        チェックイン: {new Date(item.checkInAt).toLocaleString()}
+                      </Text>
+                      {item.checkOutAt ? (
+                        <Text variant="bodySmall" style={styles.visitTime}>
+                          チェックアウト: {new Date(item.checkOutAt).toLocaleString()}
+                        </Text>
+                      ) : (
+                        <Text variant="bodySmall" style={styles.visitTime}>
+                          チェックアウト: 未完了
+                        </Text>
+                      )}
+                    </View>
                     <Text variant="bodySmall" style={styles.stayDuration}>
                       滞在時間: {formatStayDuration(item.stayDurationMinutes)}
                     </Text>
                   </View>
-                </View>
-
-                <Text variant="bodyMedium" style={styles.postContent}>
-                  {item.content}
-                </Text>
-
-                <View style={styles.postFooter}>
-                  <Text variant="bodySmall" style={styles.postMeta}>
-                    {new Date(item.createdAt).toLocaleString()}
-                  </Text>
-                  <Text variant="bodySmall" style={styles.postMeta}>
-                    ❤️ {item.likesCount}
-                  </Text>
-                </View>
-              </View>
+                )}
+              />
             )}
-          />
+          </>
         )}
       </View>
     </ProtectedScreen>
@@ -205,5 +313,33 @@ const styles = StyleSheet.create({
   postMeta: {
     color: '#aaa',
     marginTop: 4,
+  },
+  tabBar: {
+    marginHorizontal: 16,
+    marginVertical: 12,
+  },
+  visitCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  placeName: {
+    fontWeight: '600',
+  },
+  visitAddress: {
+    color: '#666',
+    marginTop: 2,
+  },
+  visitTimes: {
+    marginTop: 8,
+  },
+  visitTime: {
+    color: '#888',
   },
 });

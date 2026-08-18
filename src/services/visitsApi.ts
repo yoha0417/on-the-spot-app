@@ -10,3 +10,15 @@ export async function fetchCurrentVisit(): Promise<{ visit: VisitWithPlace }> {
   }
   return response.json();
 }
+
+interface UserVisitsResponse {
+  visits: VisitWithPlace[];
+}
+
+export async function fetchUserVisits(userId: string): Promise<UserVisitsResponse> {
+  const response = await fetch(`${BASE_URL}/v1/visits/${encodeURIComponent(userId)}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user visits: ${response.status}`);
+  }
+  return response.json();
+}
