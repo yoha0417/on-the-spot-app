@@ -1,11 +1,11 @@
-import { router } from 'expo-router';
-import { useCheckIn } from '@/contexts/CheckInContext';
 import { ProtectedScreen } from '@/components/protected-screen';
-import { fetchTimelinePosts, createPost, toggleLike } from '@/services/timelineApi';
+import { useCheckIn } from '@/contexts/CheckInContext';
+import { createPost, fetchTimelinePosts, toggleLike } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, StyleSheet, View, Modal, TextInput } from 'react-native';
-import { ActivityIndicator, Avatar, Button, Text, useTheme, FAB, Switch } from 'react-native-paper';
+import { Alert, FlatList, Modal, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Avatar, Button, FAB, Switch, Text, useTheme } from 'react-native-paper';
 
 function formatStayDuration(minutes: number): string {
   if (minutes < 60) {
@@ -38,7 +38,7 @@ export default function TimelineScreen() {
   const redirectToMap = useCallback(() => {
     Alert.alert(
       '警告',
-      'チェックインしていません。マップ画面に戻ります。',
+      '自動でチェックアウトされました。マップ画面からスポットにチェックインしてください。',
       [{ text: 'OK', onPress: () => router.replace('/(tabs)/map') }]
     );
   }, []);
