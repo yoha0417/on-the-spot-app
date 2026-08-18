@@ -184,11 +184,11 @@ export default function TimelineScreen() {
             <ActivityIndicator size="large" />
           </View>
         )}
-        {error && (
-          <View style={styles.centered}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
+{error ? (
+  <View style={styles.centered}>
+    <Text style={styles.errorText}>{error}</Text>
+  </View>
+) : null}
         {!loading && !error && (
           <>
             <View style={styles.header}>
@@ -231,11 +231,11 @@ export default function TimelineScreen() {
                     </View>
                   </View>
                   <Text variant="bodyMedium" style={styles.postContent}>{item.content}</Text>
-                  {item.isWaitingForUnlock && (
-                    <Text variant="bodySmall" style={styles.lockMessage}>
-                      🔒 この投稿はあなたがチェックアウトしてから30分後に他の人から見えます。
-                    </Text>
-                  )}
+                  {item.isWaitingForUnlock ? (
+  <Text variant="bodySmall" style={styles.lockMessage}>
+    🔒 この投稿はあなたがチェックアウトしてから30分後に他の人から見えます。
+  </Text>
+) : null}
                   <View style={styles.postFooter}>
                     <Text variant="bodySmall" style={styles.postMeta}>
                       {new Date(item.createdAt).toLocaleString()}
