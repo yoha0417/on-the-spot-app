@@ -1,10 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { loginUser, signUpUser, removeToken, getToken, getUserName } from '@/utils/auth';
+import { loginUser, signUpUser, removeToken, getToken, getUserName, getUserId, removeUserId } from '@/utils/auth';
 import { router } from 'expo-router';
 
 type AuthContextType = {
   isAuthenticated: boolean;
   userName: string | null;
+  userId: string | null;
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -24,6 +25,7 @@ export function useAuth(): AuthContextType {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(getToken());
   const [userName, setUserName] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const initializing = useRef(false);
 
@@ -35,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const storedName = await getUserName();
         setUserName(storedName);
+        const storedUserId = await getUserId();
+        setUserId(storedUserId);
       } catch {
         // ignore
       }
@@ -48,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await loginUser({ email, password });
       setToken(data.token);
       setUserName(data.user.name);
+      setUserId(data.user.id);
       router.replace('/');
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'ログインに失敗しました';
@@ -61,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await signUpUser({ email, password, name });
       setToken(data.token);
       setUserName(data.user.name);
+      setUserId(data.user.id);
       router.replace('/');
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'アカウント登録に失敗しました';
@@ -71,7 +77,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await removeToken();
+      await removeUserId();
       setToken(null);
+      setUserId(null);
       setUserName(null);
       router.replace('/login');
     } catch (e: unknown) {
@@ -87,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         isAuthenticated,
         userName,
+        userId,
         login,
         signUp,
         logout,

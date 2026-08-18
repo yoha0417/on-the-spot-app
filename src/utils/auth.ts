@@ -3,6 +3,7 @@ import { apiClient } from './apiClient';
 
 const AUTH_TOKEN_KEY = 'user_token';
 const USER_NAME_KEY = 'user_name';
+const USER_ID_KEY = 'auth_user_id';
 
 export type AuthToken = string | null;
 
@@ -54,11 +55,30 @@ export async function removeUserName(): Promise<void> {
   await SecureStore.deleteItemAsync(USER_NAME_KEY);
 }
 
+// -------------- user id management --------------
+
+export async function saveUserId(id: string): Promise<void> {
+  await SecureStore.setItemAsync(USER_ID_KEY, id);
+}
+
+export async function getUserId(): Promise<string | null> {
+  try {
+    return await SecureStore.getItemAsync(USER_ID_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export async function removeUserId(): Promise<void> {
+  await SecureStore.deleteItemAsync(USER_ID_KEY);
+}
+
 // -------------- API --------------
 
 interface LoginResponse {
   token: string;
   user: {
+    id: string;
     name: string;
   };
 }
@@ -78,6 +98,7 @@ export async function loginUser(payload: LoginPayload): Promise<LoginResponse> {
   const data = await apiClient.post<LoginResponse>('/auth/login', payload);
   await storeToken(data.token);
   await saveUserName(data.user.name);
+  await saveUserId(data.user.id);
   return data;
 }
 
@@ -85,5 +106,6 @@ export async function signUpUser(payload: SignUpPayload): Promise<LoginResponse>
   const data = await apiClient.post<LoginResponse>('/auth/register', payload);
   await storeToken(data.token);
   await saveUserName(data.user.name);
+  await saveUserId(data.user.id);
   return data;
 }

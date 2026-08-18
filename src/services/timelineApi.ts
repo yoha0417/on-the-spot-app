@@ -10,6 +10,14 @@ export async function fetchTimelinePosts(placeId: string): Promise<TimelineRespo
   return apiClient.get<TimelineResponse>(`/posts?placeId=${encodeURIComponent(placeId)}`);
 }
 
+interface UserPostsResponse {
+  posts: Post[];
+}
+
+export async function fetchUserPosts(userId: string): Promise<UserPostsResponse> {
+  return apiClient.get<UserPostsResponse>(`/posts/user/${encodeURIComponent(userId)}`);
+}
+
 interface CreatePostRequest {
   content: string;
   placeId: string;
