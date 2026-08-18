@@ -3,7 +3,7 @@ import { useCheckIn } from '@/contexts/CheckInContext';
 import { ProtectedScreen } from '@/components/protected-screen';
 import { fetchTimelinePosts, createPost, toggleLike } from '@/services/timelineApi';
 import type { Post } from '@/types/post';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View, Modal, TextInput } from 'react-native';
 import { ActivityIndicator, Avatar, Button, Text, useTheme, FAB, Switch } from 'react-native-paper';
 
@@ -21,7 +21,7 @@ function formatStayDuration(minutes: number): string {
 
 export default function TimelineScreen() {
   const theme = useTheme();
-  const { currentCheckIn } = useCheckIn();
+  const { currentCheckIn, checkOut } = useCheckIn();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,6 +30,10 @@ export default function TimelineScreen() {
   const [newContent, setNewContent] = useState('');
   const [isDelayedPublish, setIsDelayedPublish] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const listRef = useRef<FlatList<Post>>(null);
+  const hasCheckedOutRef = useRef(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const redirectToMap = useCallback(() => {
     Alert.alert(
@@ -60,6 +64,21 @@ export default function TimelineScreen() {
       setSubmitting(false);
     }
   }, [currentCheckIn, newContent, isDelayedPublish]);
+
+  const handleCheckOut = useCallback(async (placeId: string) => {
+    hasCheckedOutRef.current = true;
+    setIsCheckingOut(true);
+    try {
+      await checkOut(placeId);
+      router.replace('/(tabs)/map');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'チェックアウトに失敗しました';
+      Alert.alert('エラー', message);
+      hasCheckedOutRef.current = false;
+    } finally {
+      setIsCheckingOut(false);
+    }
+  }, [checkOut]);
 
   const handleToggleLike = useCallback(async (postId: string) => {
     const originalPost = posts.find(p => p.id === postId);
@@ -118,6 +137,9 @@ export default function TimelineScreen() {
 
   useEffect(() => {
     if (!currentCheckIn) {
+      if (hasCheckedOutRef.current) {
+        return;
+      }
       redirectToMap();
       return;
     }
@@ -168,46 +190,65 @@ export default function TimelineScreen() {
           </View>
         )}
         {!loading && !error && (
-          <FlatList
-            data={posts}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listContent}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            ListEmptyComponent={
-              <View style={styles.centered}>
-                <Text>まだ投稿がありません</Text>
-              </View>
-            }
-            renderItem={({ item }) => (
-              <View style={styles.postCard}>
-                <View style={styles.postHeader}>
-                  <Avatar.Text size={40} label={(item.userName ?? '?').charAt(0)} />
-                  <View style={styles.postHeaderInfo}>
-                    <Text variant="labelLarge" style={styles.userName}>{item.userName ?? '不明'}</Text>
-                    <Text variant="bodySmall" style={styles.stayDuration}>
-                      滞在時間: {formatStayDuration(item.stayDurationMinutes)}
+          <>
+            <View style={styles.header}>
+              <Button
+                mode="contained"
+                onPress={() => handleCheckOut(currentCheckIn?.placeId ?? '')}
+                loading={isCheckingOut}
+                disabled={isCheckingOut}
+                buttonColor={theme.colors.error}
+                textColor={theme.colors.onError}
+              >
+                チェックアウト
+              </Button>
+            </View>
+            <FlatList
+              ref={listRef}
+              data={posts}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.listContent}
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              onScroll={({ nativeEvent }) => {
+                setShowScrollTop(nativeEvent.contentOffset.y > 200);
+              }}
+              scrollEventThrottle={16}
+              ListEmptyComponent={
+                <View style={styles.centered}>
+                  <Text>まだ投稿がありません</Text>
+                </View>
+              }
+              renderItem={({ item }) => (
+                <View style={styles.postCard}>
+                  <View style={styles.postHeader}>
+                    <Avatar.Text size={40} label={(item.userName ?? '?').charAt(0)} />
+                    <View style={styles.postHeaderInfo}>
+                      <Text variant="labelLarge" style={styles.userName}>{item.userName ?? '不明'}</Text>
+                      <Text variant="bodySmall" style={styles.stayDuration}>
+                        滞在時間: {formatStayDuration(item.stayDurationMinutes)}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text variant="bodyMedium" style={styles.postContent}>{item.content}</Text>
+                  <View style={styles.postFooter}>
+                    <Text variant="bodySmall" style={styles.postMeta}>
+                      {new Date(item.createdAt).toLocaleString()}
                     </Text>
+                    <Button
+                      mode="text"
+                      icon={item.isLiked ? 'heart' : 'heart-outline'}
+                      textColor={item.isLiked ? '#e0245e' : '#aaa'}
+                      onPress={() => handleToggleLike(item.id)}
+                      compact
+                    >
+                      {item.likesCount > 0 ? item.likesCount : ''}
+                    </Button>
                   </View>
                 </View>
-                <Text variant="bodyMedium" style={styles.postContent}>{item.content}</Text>
-                <View style={styles.postFooter}>
-                  <Text variant="bodySmall" style={styles.postMeta}>
-                    {new Date(item.createdAt).toLocaleString()}
-                  </Text>
-                  <Button
-                    mode="text"
-                    icon={item.isLiked ? 'heart' : 'heart-outline'}
-                    textColor={item.isLiked ? '#e0245e' : '#aaa'}
-                    onPress={() => handleToggleLike(item.id)}
-                    compact
-                  >
-                    {item.likesCount > 0 ? item.likesCount : ''}
-                  </Button>
-                </View>
-              </View>
-            )}
-          />
+              )}
+            />
+          </>
         )}
       </View>
 
@@ -216,6 +257,13 @@ export default function TimelineScreen() {
         style={styles.fab}
         onPress={() => setModalVisible(true)}
         visible={!modalVisible}
+      />
+
+      <FAB
+        icon="arrow-up"
+        style={styles.scrollTopFab}
+        onPress={() => listRef.current?.scrollToOffset({ offset: 0, animated: true })}
+        visible={showScrollTop}
       />
 
       <Modal
@@ -331,6 +379,17 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 16,
+    bottom: 16,
+  },
+  header: {
+    padding: 8,
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#ddd',
+  },
+  scrollTopFab: {
+    position: 'absolute',
+    left: 16,
     bottom: 16,
   },
   modalContainer: {
