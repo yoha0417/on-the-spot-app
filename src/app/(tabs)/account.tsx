@@ -204,7 +204,7 @@ export default function AccountScreen() {
             {!visitsLoading && !error && (
               <FlatList
                 data={visits}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.visitId}
                 contentContainerStyle={styles.listContent}
                 ListEmptyComponent={
                   <View style={styles.centered}>
@@ -214,20 +214,20 @@ export default function AccountScreen() {
                 renderItem={({ item }) => (
                   <View style={styles.visitCard}>
                     <Text variant="titleMedium" style={styles.placeName}>
-                      {item.placeName}
+                      {item.place.name}
                     </Text>
-                    {item.placeAddress ? (
+                    {item.place.address ? (
                       <Text variant="bodySmall" style={styles.visitAddress}>
-                        {item.placeAddress}
+                        {item.place.address}
                       </Text>
                     ) : null}
                     <View style={styles.visitTimes}>
                       <Text variant="bodySmall" style={styles.visitTime}>
-                        チェックイン: {new Date(item.checkInAt).toLocaleString()}
+                        チェックイン: {new Date(item.checkedInAt).toLocaleString()}
                       </Text>
-                      {item.checkOutAt ? (
+                      {item.checkedOutAt ? (
                         <Text variant="bodySmall" style={styles.visitTime}>
-                          チェックアウト: {new Date(item.checkOutAt).toLocaleString()}
+                          チェックアウト: {new Date(item.checkedOutAt).toLocaleString()}
                         </Text>
                       ) : (
                         <Text variant="bodySmall" style={styles.visitTime}>
@@ -236,7 +236,7 @@ export default function AccountScreen() {
                       )}
                     </View>
                     <Text variant="bodySmall" style={styles.stayDuration}>
-                      滞在時間: {formatStayDuration(item.stayDurationMinutes)}
+                      滞在時間: {formatStayDuration(item.durationMinutes)}
                     </Text>
                   </View>
                 )}
