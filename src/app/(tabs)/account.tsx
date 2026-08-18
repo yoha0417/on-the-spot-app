@@ -115,7 +115,7 @@ export default function AccountScreen() {
         <View style={styles.header}>
           <Avatar.Text size={64} label={(userName ?? '?').charAt(0)} />
           <Text variant="headlineSmall" style={styles.userName}>
-            やあ、{userName ?? '不明'}
+            {userName ?? '不明'}
           </Text>
         </View>
 
