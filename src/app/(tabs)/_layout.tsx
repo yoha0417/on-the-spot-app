@@ -2,9 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs, useNavigation } from 'expo-router';
 import { DrawerActions } from 'expo-router/react-navigation';
 import { Pressable } from 'react-native';
+import { useCheckIn } from '@/contexts/CheckInContext';
 
 export default function TabLayout() {
   const navigation = useNavigation();
+  const { currentCheckIn } = useCheckIn();
 
   return (
     <Tabs
@@ -38,6 +40,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles-outline" size={size} color={color} />
           ),
+          ...(currentCheckIn ? {} : { href: null }),
         }}
       />
       <Tabs.Screen
